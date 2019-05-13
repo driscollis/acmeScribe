@@ -104,5 +104,5 @@ venv.bak/
 .mypy_cache/
 
 # Wing
-.wpr
-.wpu
+*.wpr
+*.wpu

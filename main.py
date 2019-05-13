@@ -1,4 +1,8 @@
+# main.py
+
+import os
 import re
+import time
 import wx
 import wx.richtext as rt
 
@@ -28,6 +32,9 @@ class FilePanel(wx.Panel):
         super().__init__(parent)
         self.create_ui()
         pub.subscribe(self.get_counts, 'tab_changed')
+        self.save_location = None
+
+
 
     def create_ui(self):
         main_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -44,6 +51,7 @@ class FilePanel(wx.Panel):
         text control
         """
         self.get_counts()
+        self.save()
 
     def get_counts(self):
         """
@@ -53,6 +61,26 @@ class FilePanel(wx.Panel):
         chars = len(value)
         words = len(re.findall('\w+', value))
         pub.sendMessage('update_counts', chars=chars, words=words)
+
+    def save(self):
+        """
+        Save the file
+        """
+        if self.save_location is None:
+            paths = wx.StandardPaths.Get()
+            tmp = paths.GetTempDir()
+            now = int(time.time())
+            self.save_location = os.path.join(tmp, f'{now}.txt')
+        data = self.text_ctrl.GetValue()
+        if data:
+            try:
+                with open(self.save_location, 'w') as f:
+                    f.write(data)
+                # TODO - Remove this print
+                print(f'Saved {self.save_location} @ {time.time()}')
+            except:
+                # TODO - replace with message dialog
+                print('Unable to save')
 
 
 class MainPanel(wx.Panel):
@@ -79,7 +107,7 @@ class MainPanel(wx.Panel):
             self, label='Remaining: Characters: 5000 / Words 2500')
         main_sizer.Add(self.remaining, 0, wx.LEFT, 5)
         target = wx.StaticText(
-            self, label='Target: 5000 Characters / 2500 Words')
+            self, label='(Target: 5000 Characters / 2500 Words)')
         main_sizer.Add(target, 0, wx.LEFT|wx.BOTTOM, 5)
 
         self.SetSizer(main_sizer)

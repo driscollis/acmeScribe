@@ -12,10 +12,11 @@ from pubsub import pub
 wildcard = "All files (*.*)|*.*"
 
 def save_file():
+    paths = wx.StandardPaths.Get()
     with wx.FileDialog(
                     self, message="Save file as ...",
                                 defaultDir='~',
-                                defaultFile='',
+                                defaultFile=paths.GetDocumentsDir(),
                                 wildcard=wildcard,
                                 style=wx.FD_SAVE
                                 ) as dlg:

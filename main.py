@@ -2,6 +2,9 @@ import re
 import wx
 import wx.richtext as rt
 
+from pubsub import pub
+
+
 wildcard = "All files (*.*)|*.*"
 
 def save_file():
@@ -40,9 +43,9 @@ class FilePanel(wx.Panel):
         text control
         """
         value = self.text_ctrl.GetValue()
-        print(f'Number of characters: {len(value)}')
-        words = re.findall('\w+', value)
-        print(f'Number of words: {len(words)}')
+        chars = len(value)
+        words = len(re.findall('\w+', value))
+        pub.sendMessage('update_counts', chars=chars, words=words)
 
 
 class MainPanel(wx.Panel):
@@ -50,6 +53,7 @@ class MainPanel(wx.Panel):
     def __init__(self, parent):
         super().__init__(parent)
         self.create_ui()
+        pub.subscribe(self.update_counts, 'update_counts')
 
     def create_ui(self):
         main_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -59,7 +63,6 @@ class MainPanel(wx.Panel):
             tab_panel = FilePanel(notebook)
             notebook.AddPage(tab_panel, f'File {tab+1}')
         main_sizer.Add(notebook, 1, wx.ALL | wx.EXPAND, 5)
-
 
         self.current_count = wx.StaticText(
             self, label='Current: Characters: 0 / Words: 0')
@@ -72,6 +75,21 @@ class MainPanel(wx.Panel):
         main_sizer.Add(target, 0, wx.LEFT|wx.BOTTOM, 5)
 
         self.SetSizer(main_sizer)
+
+    def update_counts(self, chars, words):
+        """
+        PubSub Subscriber for updating the char / word counts
+        """
+        curr_lbl = f'Current: Characters: {chars} / Words: {words}'
+        self.current_count.SetLabel(curr_lbl)
+
+        if chars > 5000:
+            remain_lbl = f'Remaining: Characters: 0 / Words: 0'
+        else:
+            chars = 5000 - chars
+            words = 2500 - words
+            remain_lbl = f'Remaining: Characters: {chars} / Words: {words}'
+        self.remaining.SetLabel(remain_lbl)
 
 
 class MainFrame(wx.Frame):

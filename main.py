@@ -9,22 +9,26 @@ import wx.richtext as rt
 from pubsub import pub
 
 
-wildcard = "All files (*.*)|*.*"
+wildcard = "Text files (*.txt)|*.txt"
 
-def save_file():
+def prompt_to_save():
+    """
+    Prompt user for save location
+    """
     paths = wx.StandardPaths.Get()
     with wx.FileDialog(
-                    self, message="Save file as ...",
-                                defaultDir='~',
-                                defaultFile=paths.GetDocumentsDir(),
+                    None, message="Save file as ...",
+                                defaultDir=paths.GetDocumentsDir(),
+                                defaultFile='',
                                 wildcard=wildcard,
                                 style=wx.FD_SAVE
                                 ) as dlg:
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
-            self.save(path)
-            return True
-    return False
+            _, ext = os.path.splitext(path)
+            if '.txt' not in ext.lower():
+                path = f'{path}.txt'
+            return path
 
 
 class FilePanel(wx.Panel):
@@ -34,8 +38,7 @@ class FilePanel(wx.Panel):
         self.create_ui()
         pub.subscribe(self.get_counts, 'tab_changed')
         self.save_location = None
-
-
+        self.tmp_location = True
 
     def create_ui(self):
         main_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -136,14 +139,30 @@ class MainPanel(wx.Panel):
         if current_page:
             current_page.get_counts()
 
+    def save_all_pages(self):
+        pages = self.notebook.GetPageCount()
+        for page in range(pages):
+            self.notebook.SetSelection(page)
+            current_page = self.notebook.GetCurrentPage()
+            data = current_page.text_ctrl.GetValue()
+            if current_page.tmp_location and data:
+                # prompt to save
+                current_page.save_location = prompt_to_save()
+                current_page.save()
+
 
 class MainFrame(wx.Frame):
 
     def __init__(self):
         super().__init__(None, title='acmeScribe',
                          size=(800, 600))
-        panel = MainPanel(self)
+        self.panel = MainPanel(self)
+        self.Bind(wx.EVT_CLOSE, self.on_close)
         self.Show()
+
+    def on_close(self, event):
+        self.panel.save_all_pages()
+        self.Destroy()
 
 
 if __name__ == '__main__':

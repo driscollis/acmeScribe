@@ -97,6 +97,9 @@ class MainPanel(wx.Panel):
         self.remaining.SetLabel(remain_lbl)
 
     def on_tab_change(self, event):
+        """
+        Event handler for changing tabs in the notebook
+        """
         current_page = self.notebook.GetCurrentPage()
         if current_page:
             current_page.get_counts()

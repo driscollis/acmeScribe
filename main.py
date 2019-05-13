@@ -27,6 +27,7 @@ class FilePanel(wx.Panel):
     def __init__(self, parent):
         super().__init__(parent)
         self.create_ui()
+        pub.subscribe(self.get_counts, 'tab_changed')
 
     def create_ui(self):
         main_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -42,6 +43,9 @@ class FilePanel(wx.Panel):
         Event handler that is fired when the user edits the
         text control
         """
+        self.get_counts()
+
+    def get_counts(self):
         value = self.text_ctrl.GetValue()
         chars = len(value)
         words = len(re.findall('\w+', value))
@@ -57,12 +61,13 @@ class MainPanel(wx.Panel):
 
     def create_ui(self):
         main_sizer = wx.BoxSizer(wx.VERTICAL)
-        notebook = wx.Notebook(self)
+        self.notebook = wx.Notebook(self)
+        self.notebook.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.on_tab_change)
 
         for tab in range(8):
-            tab_panel = FilePanel(notebook)
-            notebook.AddPage(tab_panel, f'File {tab+1}')
-        main_sizer.Add(notebook, 1, wx.ALL | wx.EXPAND, 5)
+            tab_panel = FilePanel(self.notebook)
+            self.notebook.AddPage(tab_panel, f'File {tab+1}')
+        main_sizer.Add(self.notebook, 1, wx.ALL | wx.EXPAND, 5)
 
         self.current_count = wx.StaticText(
             self, label='Current: Characters: 0 / Words: 0')
@@ -90,6 +95,11 @@ class MainPanel(wx.Panel):
             words = 2500 - words
             remain_lbl = f'Remaining: Characters: {chars} / Words: {words}'
         self.remaining.SetLabel(remain_lbl)
+
+    def on_tab_change(self, event):
+        current_page = self.notebook.GetCurrentPage()
+        if current_page:
+            current_page.get_counts()
 
 
 class MainFrame(wx.Frame):

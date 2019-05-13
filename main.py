@@ -32,6 +32,9 @@ def prompt_to_save():
 
 
 class FilePanel(wx.Panel):
+    """
+    Class that contains UI for the Notebook page / tab
+    """
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -41,6 +44,9 @@ class FilePanel(wx.Panel):
         self.tmp_location = True
 
     def create_ui(self):
+        """
+        Create the UI for the notebook page
+        """
         main_sizer = wx.BoxSizer(wx.VERTICAL)
 
         self.text_ctrl = wx.TextCtrl(self, style=wx.TE_MULTILINE)
@@ -88,6 +94,9 @@ class FilePanel(wx.Panel):
 
 
 class MainPanel(wx.Panel):
+    """
+    Class that holds the main panel's UI code / logic
+    """
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -95,6 +104,9 @@ class MainPanel(wx.Panel):
         pub.subscribe(self.update_counts, 'update_counts')
 
     def create_ui(self):
+        """
+        Create UI in main panel
+        """
         main_sizer = wx.BoxSizer(wx.VERTICAL)
         self.notebook = wx.Notebook(self)
         self.notebook.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.on_tab_change)
@@ -140,6 +152,10 @@ class MainPanel(wx.Panel):
             current_page.get_counts()
 
     def save_all_pages(self):
+        """
+        Loop through all pages in notebook and prompt to save if
+        they are currently saved to a temp location
+        """
         pages = self.notebook.GetPageCount()
         for page in range(pages):
             self.notebook.SetSelection(page)
@@ -152,6 +168,9 @@ class MainPanel(wx.Panel):
 
 
 class MainFrame(wx.Frame):
+    """
+    The class that holds the top level widget
+    """
 
     def __init__(self):
         super().__init__(None, title='acmeScribe',
@@ -161,6 +180,9 @@ class MainFrame(wx.Frame):
         self.Show()
 
     def on_close(self, event):
+        """
+        Event handler that runs when the application is closing
+        """
         self.panel.save_all_pages()
         self.Destroy()
 

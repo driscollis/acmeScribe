@@ -1,5 +1,23 @@
+import re
 import wx
 import wx.richtext as rt
+
+wildcard = "All files (*.*)|*.*"
+
+def save_file():
+    with wx.FileDialog(
+                    self, message="Save file as ...",
+                                defaultDir='~',
+                                defaultFile='',
+                                wildcard=wildcard,
+                                style=wx.FD_SAVE
+                                ) as dlg:
+        if dlg.ShowModal() == wx.ID_OK:
+            path = dlg.GetPath()
+            self.save(path)
+            return True
+    return False
+
 
 class FilePanel(wx.Panel):
 

@@ -46,6 +46,9 @@ class FilePanel(wx.Panel):
         self.get_counts()
 
     def get_counts(self):
+        """
+        Get char and word counts and update labels
+        """
         value = self.text_ctrl.GetValue()
         chars = len(value)
         words = len(re.findall('\w+', value))

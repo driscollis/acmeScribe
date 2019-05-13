@@ -59,6 +59,18 @@ class MainPanel(wx.Panel):
             tab_panel = FilePanel(notebook)
             notebook.AddPage(tab_panel, f'File {tab+1}')
         main_sizer.Add(notebook, 1, wx.ALL | wx.EXPAND, 5)
+
+
+        self.current_count = wx.StaticText(
+            self, label='Current: Characters: 0 / Words: 0')
+        main_sizer.Add(self.current_count, 0, wx.TOP | wx.LEFT, 5)
+        self.remaining = wx.StaticText(
+            self, label='Remaining: Characters: 5000 / Words 2500')
+        main_sizer.Add(self.remaining, 0, wx.LEFT, 5)
+        target = wx.StaticText(
+            self, label='Target: 5000 Characters / 2500 Words')
+        main_sizer.Add(target, 0, wx.LEFT|wx.BOTTOM, 5)
+
         self.SetSizer(main_sizer)
 
 

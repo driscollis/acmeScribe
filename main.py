@@ -11,9 +11,20 @@ class FilePanel(wx.Panel):
         main_sizer = wx.BoxSizer(wx.VERTICAL)
 
         self.text_ctrl = wx.TextCtrl(self, style=wx.TE_MULTILINE)
+        self.text_ctrl.Bind(wx.EVT_TEXT, self.on_text)
         main_sizer.Add(self.text_ctrl, 1, wx.ALL | wx.EXPAND, 5)
 
         self.SetSizer(main_sizer)
+
+    def on_text(self, event):
+        """
+        Event handler that is fired when the user edits the
+        text control
+        """
+        value = self.text_ctrl.GetValue()
+        print(f'Number of characters: {len(value)}')
+        words = re.findall('\w+', value)
+        print(f'Number of words: {len(words)}')
 
 
 class MainPanel(wx.Panel):

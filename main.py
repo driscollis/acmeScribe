@@ -86,8 +86,6 @@ class FilePanel(wx.Panel):
             try:
                 with open(self.save_location, 'w') as f:
                     f.write(data)
-                # TODO - Remove this print
-                print(f'Saved {self.save_location} @ {time.time()}')
             except:
                 # TODO - replace with message dialog
                 print('Unable to save')

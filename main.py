@@ -105,6 +105,17 @@ class MainPanel(wx.Panel):
         Create UI in main panel
         """
         main_sizer = wx.BoxSizer(wx.VERTICAL)
+
+        # Add leaderboard button
+        btn_sizer = wx.BoxSizer()
+        bmp = wx.ArtProvider.GetBitmap(
+            wx.ART_INFORMATION, wx.ART_TOOLBAR, (16,16))
+        leaderboard = wx.BitmapButton(self, bitmap=bmp, size=(40, 40))
+        btn_sizer.AddStretchSpacer(prop=2)
+        btn_sizer.Add(leaderboard, 0, wx.ALL, 5)
+        main_sizer.Add(btn_sizer, 0, wx.EXPAND)
+
+        # Add notebook
         self.notebook = wx.Notebook(self)
         self.notebook.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.on_tab_change)
 

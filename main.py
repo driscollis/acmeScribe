@@ -4,7 +4,6 @@ import os
 import re
 import time
 import wx
-import wx.richtext as rt
 
 from pubsub import pub
 

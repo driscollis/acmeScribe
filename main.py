@@ -5,6 +5,7 @@ import re
 import time
 import wx
 
+from leaderboard import Leaderboard
 from pubsub import pub
 
 
@@ -104,37 +105,52 @@ class MainPanel(wx.Panel):
         """
         Create UI in main panel
         """
-        main_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.main_sizer = wx.BoxSizer(wx.VERTICAL)
 
         # Add leaderboard button
         btn_sizer = wx.BoxSizer()
         bmp = wx.ArtProvider.GetBitmap(
             wx.ART_INFORMATION, wx.ART_TOOLBAR, (16,16))
-        leaderboard = wx.BitmapButton(self, bitmap=bmp, size=(40, 40))
+        self.leaderboard_btn = wx.ToggleButton(self, size=(40, 40))
+        self.leaderboard_btn.SetBitmap(bmp)
+        self.leaderboard_btn.Bind(wx.EVT_TOGGLEBUTTON, self.on_leaderboard)
         btn_sizer.AddStretchSpacer(prop=2)
-        btn_sizer.Add(leaderboard, 0, wx.ALL, 5)
-        main_sizer.Add(btn_sizer, 0, wx.EXPAND)
+        btn_sizer.Add(self.leaderboard_btn, 0, wx.ALL, 5)
+        self.main_sizer.Add(btn_sizer, 0, wx.EXPAND)
 
         # Add notebook
+        hsizer = wx.BoxSizer(wx.HORIZONTAL)
         self.notebook = wx.Notebook(self)
         self.notebook.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.on_tab_change)
 
         for tab in range(8):
             tab_panel = FilePanel(self.notebook)
             self.notebook.AddPage(tab_panel, f'File {tab+1}')
-        main_sizer.Add(self.notebook, 1, wx.ALL | wx.EXPAND, 5)
+        hsizer.Add(self.notebook, 2, wx.ALL | wx.EXPAND, 5)
 
+        # Add leaderboard widget (HtmlWindow)
+        self.leaderboard = Leaderboard(self)
+        self.leaderboard.SetPage(
+            '''
+            <h2>Leaderboard</h2>
+            ''')
+        hsizer.Add(self.leaderboard, 1, wx.ALL | wx.EXPAND, 5)
+        self.leaderboard.Hide()
+        self.main_sizer.Add(hsizer, 1, wx.ALL | wx.EXPAND)
+
+        # Add counters
         self.current_count = wx.StaticText(
             self, label='Current: Characters: 0 / Words: 0')
-        main_sizer.Add(self.current_count, 0, wx.TOP | wx.LEFT, 5)
+        self.main_sizer.Add(self.current_count, 0, wx.TOP | wx.LEFT, 5)
         self.remaining = wx.StaticText(
             self, label='Remaining: Characters: 5000 / Words 2500')
-        main_sizer.Add(self.remaining, 0, wx.LEFT, 5)
+        self.main_sizer.Add(self.remaining, 0, wx.LEFT, 5)
         target = wx.StaticText(
             self, label='(Target: 5000 Characters / 2500 Words)')
-        main_sizer.Add(target, 0, wx.LEFT|wx.BOTTOM, 5)
+        self.main_sizer.Add(target, 0, wx.LEFT|wx.BOTTOM, 5)
 
-        self.SetSizer(main_sizer)
+        self.SetSizer(self.main_sizer)
+        self.main_sizer.Layout()
 
     def update_counts(self, chars, words):
         """
@@ -150,6 +166,16 @@ class MainPanel(wx.Panel):
             words = 2500 - words
             remain_lbl = f'Remaining: Characters: {chars} / Words: {words}'
         self.remaining.SetLabel(remain_lbl)
+
+    def on_leaderboard(self, event):
+        """
+        Toggle visibility of leaderboard
+        """
+        if self.leaderboard_btn.GetValue():
+            self.leaderboard.Show()
+        else:
+            self.leaderboard.Hide()
+        self.main_sizer.Layout()
 
     def on_tab_change(self, event):
         """

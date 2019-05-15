@@ -6,6 +6,7 @@ import wx
 from file_panel import FilePanel
 from leaderboard import Leaderboard
 from pubsub import pub
+import wx.lib.agw.flatnotebook as fnb
 
 
 wildcard = "Text files (*.txt)|*.txt"
@@ -59,7 +60,10 @@ class MainPanel(wx.Panel):
 
         # Add notebook
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.notebook = wx.Notebook(self)
+        self.notebook = fnb.FlatNotebook(self)
+        style = self.notebook.GetAGWWindowStyleFlag()
+        style |= fnb.FNB_NO_X_BUTTON
+        self.notebook.SetAGWWindowStyleFlag(style)
         self.notebook.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.on_tab_change)
 
         for tab in range(8):

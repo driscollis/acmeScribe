@@ -50,7 +50,7 @@ class MainPanel(wx.Panel):
         # Add leaderboard button
         btn_sizer = wx.BoxSizer()
         bmp = wx.ArtProvider.GetBitmap(
-            wx.ART_INFORMATION, wx.ART_TOOLBAR, (16,16))
+            wx.ART_TICK_MARK, wx.ART_TOOLBAR, (16,16))
         self.leaderboard_btn = wx.ToggleButton(self, size=(40, 40))
         self.leaderboard_btn.SetBitmap(bmp)
         self.leaderboard_btn.Bind(wx.EVT_TOGGLEBUTTON, self.on_leaderboard)
